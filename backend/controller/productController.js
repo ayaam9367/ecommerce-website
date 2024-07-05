@@ -47,7 +47,7 @@ exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
   if (!product) {
-    return res.status(500).josn({
+    return res.status(404).josn({
       success: false,
       message: "product not found",
     });
@@ -68,7 +68,7 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
 exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
-    return res.status(500).json({
+    return res.status(404).json({
       success: false,
       message: "Product not found",
     });
@@ -80,3 +80,11 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     messgae: "Product deleted successfully",
   });
 });
+
+
+/**
+ * Future work 
+ * 
+ * Level : urgent
+ * description : refactor the code to improve consistency of code habits for eg in line: 50 use the ErrorHandler to send the error to next();
+ */

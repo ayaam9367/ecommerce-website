@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
         type : String,
         required : [true, "Please enter your password"],
         minLength: [8, "Password should be greater than 8 characters"],
-        //select : false //you won't be able to findByAttribute on password
+        select : false //you won't be able to findByAttribute on password
     },
     avatar : {
         public_id: {

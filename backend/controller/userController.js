@@ -1,100 +1,167 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
+const mongoose = require("mongoose");
+
+
+
+const ObjectId = mongoose.Types.ObjectId;
 
 //Register a User
-exports.registerUser = catchAsyncErrors( async(req, res, next) => {
+exports.registerUser = catchAsyncErrors(async (req, res, next) => {
+  const { name, email, password } = req.body;
+  const user = await User.create({
+    name,
+    email,
+    password,
+    avatar: {
+      public_id: "this is a sample id",
+      url: "profilepicUrl",
+    },
+  });
 
-    const {name, email, password} = req.body;
-    const user = await User.create({
-        name,
-        email,
-        password,
-        avatar: {
-            public_id : "this is a sample id",
-            url : "profilepicUrl"
-        },
-    });
-
-    res.status(201).json({
-        success: true,
-        user,
-    });
+  res.status(201).json({
+    success: true,
+    user,
+  });
 });
 
-//get user details
-//update user details/profile
 //update user password
-//delete a user -- ADMIN
-// get a single user (by id)--ADMIN
-//get all users -- ADMIN
 
 
 //get all users -- ADMIN
-exports.getAllUsers = catchAsyncErrors(async(req, res, next) => {
-
-    const users = await User.find();
-    res.status(200).json({
-        success : true,
-        message : "all users found",
-        users
-    });
+exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {
+  const users = await User.find();
+  res.status(200).json({
+    success: true,
+    message: "all users found",
+    users,
+  });
 });
-
 
 //get a single user -- ADMIN
-exports.getSingleUser = catchAsyncErrors(async(req, res, next) => {
-    const user = await User.findById(req.params.id);
-    if(!user){
-        res.status(404).json({
-            success : false,
-            message : "user not found"
-        });
-    } else {
-        res.status(200).json({
-            success : true,
-            message : "user found successfully",
-            user
-        });
-    }
-});
+exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorHandler(`User not found`, 404));
+  }
 
+  
+
+  const passwordPipeline = createPasswordPipeline(req.params.id);
+  const passwordResult = await User.aggregate(passwordPipeline);
+  const password = passwordResult[0] ? passwordResult[0].password : null;
+  console.log(password);
+  
+
+  res.status(200).json({
+    success: true,
+    message: "user found successfully",
+    user,
+  });
+
+});
 
 //update user profile
-exports.updateUser = catchAsyncErrors(async(req, res, next) => {
-    let user = await User.findById(req.params.id);
-    if(!user){
-        res.status(404).json({
-            success : false
-        });
-    }
+exports.updateUserProfile = catchAsyncErrors(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorHandler(`User not found`, 404));
+  }
 
-    user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new : true,
-        runValidators : true,
-    });
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+  };
 
-    res.status(202).json({
-        success : true,
-        message : "user updated successfully",
-        user,
-    });
+  user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(202).json({
+    success: true,
+    message: "user updated successfully",
+    user,
+  });
+});
+
+//update user password
+exports.updateUserPassword = catchAsyncErrors(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorHandler(`User not found`, 404));
+  }
+
 
 });
 
+//update user role -- ADMIN
+exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorHandler(`User not found`, 404));
+  }
 
-exports.deleteUser = catchAsyncErrors(async(req, res, next) => {
-    let user = await User.findById(req.params.id);
-    if(!user){
-        res.status(404).json({
-            success : false,
-            message : "user not found"
-        });
-    }
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
 
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json({
-        success : true,
-        message : "user deleted successfully"
-    });
+  user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "user updated successfully",
+    user,
+  });
 });
+
+//delete user -- ADMIN
+exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorHandler(`User not found`, 404));
+  }
+
+  await User.findByIdAndDelete(req.params.id);
+  res.status(200).json({
+    success: true,
+    message: "user deleted successfully",
+  });
+});
+
+
+const createPasswordPipeline = (id) => 
+    [
+        {
+          $match: {
+            _id : new ObjectId(id)
+          }
+        },
+        
+        {
+          $project: {
+            "password" : 1,
+            _id : 0
+          }
+        }
+    ];
+
+
+
+
+
+
+
+
+/**
+ * Future Work
+ * 
+ * Level : Urgent
+ * Descriiption : make a private function to check whether the user witht the given id exists (DRY)
+ */

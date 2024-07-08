@@ -84,7 +84,7 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
   const passwordPipeline = createPasswordPipeline(req.params.id);
   const passwordResult = await User.aggregate(passwordPipeline);
   const password = passwordResult[0] ? passwordResult[0].password : null;
-  console.log(password);
+  //console.log(password);
 
   res.status(200).json({
     success: true,

@@ -2,8 +2,7 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
-
-
+const sendToken = require("../utils/jwtToken");
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -20,14 +19,34 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
-  res.status(201).json({
-    success: true,
-    user,
-  });
+  sendToken(user, 201, res);
+});
+
+//Login User
+exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  //checking is user has given both email and password
+  if (!email || !password) {
+    return next(new ErrorHandler("Please enter both email and password", 400));
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    return next(new ErrorHandler("Invalid email or password", 404));
+  }
+
+  const isPasswordMatched = user.comparePassword(password);
+
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid email or password", 401));
+  }
+
+  sendToken(user, 200, res);
 });
 
 //update user password
-
 
 //get all users -- ADMIN
 exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {
@@ -46,20 +65,16 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(`User not found`, 404));
   }
 
-  
-
   const passwordPipeline = createPasswordPipeline(req.params.id);
   const passwordResult = await User.aggregate(passwordPipeline);
   const password = passwordResult[0] ? passwordResult[0].password : null;
   console.log(password);
-  
 
   res.status(200).json({
     success: true,
     message: "user found successfully",
     user,
   });
-
 });
 
 //update user profile
@@ -92,8 +107,6 @@ exports.updateUserPassword = catchAsyncErrors(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler(`User not found`, 404));
   }
-
-
 });
 
 //update user role -- ADMIN
@@ -135,33 +148,24 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+const createPasswordPipeline = (id) => [
+  {
+    $match: {
+      _id: new ObjectId(id),
+    },
+  },
 
-const createPasswordPipeline = (id) => 
-    [
-        {
-          $match: {
-            _id : new ObjectId(id)
-          }
-        },
-        
-        {
-          $project: {
-            "password" : 1,
-            _id : 0
-          }
-        }
-    ];
-
-
-
-
-
-
-
+  {
+    $project: {
+      password: 1,
+      _id: 0,
+    },
+  },
+];
 
 /**
  * Future Work
- * 
+ *
  * Level : Urgent
  * Descriiption : make a private function to check whether the user witht the given id exists (DRY)
  */

@@ -140,9 +140,9 @@ exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//get a single user -- ADMIN
-exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+//get user detail -- Only for logged in user`
+exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
   if (!user) {
     return next(new ErrorHandler(`User not found`, 404));
   }

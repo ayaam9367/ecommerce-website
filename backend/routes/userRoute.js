@@ -11,7 +11,10 @@ const {
   logout,
   forgotPassword,
   resetPassword,
+  getUserDetails,
 } = require("../controller/userController");
+const {isAuthenticatedUser, authorizeRoles} = require("../middleware/auth");
+
 const router = express.Router();
 
 router.route("/register").post(registerUser);
@@ -20,7 +23,7 @@ router.route("/password/forgot").post(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
 router.route("/logout").get(logout);
 router.route("/getAllUsers").get(getAllUsers);
-router.route("/getUser/:id").get(getSingleUser);
+router.route("/me").get(isAuthenticatedUser, getUserDetails);
 router.route("/updateUserProfile/:id").put(updateUserProfile);
 router.route("/updateUserRole/:id").put(updateUserRole);
 router.route("/deleteUser/:id").delete(deleteUser);

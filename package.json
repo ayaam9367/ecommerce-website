@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/nodemailer": "^6.4.15",
     "@types/validator": "^13.12.0"
   }
 }

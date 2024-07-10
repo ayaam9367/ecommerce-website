@@ -159,9 +159,9 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//update user profile
-exports.updateUserProfile = catchAsyncErrors(async (req, res, next) => {
-  let user = await User.findById(req.params.id);
+//update user profile -- Only for logged in user
+exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+  let user = await User.findById(req.user.id);
   if (!user) {
     return next(new ErrorHandler(`User not found`, 404));
   }
@@ -171,7 +171,7 @@ exports.updateUserProfile = catchAsyncErrors(async (req, res, next) => {
     email: req.body.email,
   };
 
-  user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+  user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
   });

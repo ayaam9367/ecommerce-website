@@ -5,7 +5,7 @@ const {
   getSingleUser,
   updateUser,
   deleteUser,
-  updateUserProfile,
+  updateProfile,
   updateUserRole,
   loginUser,
   logout,
@@ -26,7 +26,7 @@ router.route("/logout").get(logout);
 router.route("/getAllUsers").get(getAllUsers);
 router.route("/me").get(isAuthenticatedUser, getUserDetails);
 router.route("/password/update").put(isAuthenticatedUser, updatePassword);
-router.route("/updateUserProfile/:id").put(updateUserProfile);
+router.route("/me/update").put(isAuthenticatedUser, updateProfile);
 router.route("/updateUserRole/:id").put(updateUserRole);
 router.route("/deleteUser/:id").delete(deleteUser);
 

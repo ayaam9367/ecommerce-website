@@ -140,7 +140,7 @@ exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//get user detail -- Only for logged in user`
+//get user detail -- Only for logged in user
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -183,12 +183,27 @@ exports.updateUserProfile = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//update user password
-exports.updateUserPassword = catchAsyncErrors(async (req, res, next) => {
-  let user = await User.findById(req.params.id);
+//update user password --only for Logged in user
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+  let user = await User.findById(req.user.id).select("+password");
   if (!user) {
     return next(new ErrorHandler(`User not found`, 404));
   }
+
+  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+  if(!isPasswordMatched){
+    return next(new ErrorHandler("old password is incorrect", 400));
+  }
+
+  if(req.body.newPassword !== req.body.confirmPassword){
+    return next(new ErrorHandler("password does not match", 400));
+  }
+
+  user.password = req.body.newPassword;
+  await user.save();
+  const data = {message : "Password updated successfully"};
+  sendToken(user, 200, res, data);
+
 });
 
 //update user role -- ADMIN

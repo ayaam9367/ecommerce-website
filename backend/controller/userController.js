@@ -161,11 +161,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
 //update user profile -- Only for logged in user
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
-  let user = await User.findById(req.user.id);
-  if (!user) {
-    return next(new ErrorHandler(`User not found`, 404));
-  }
-
+  
   const newUserData = {
     name: req.body.name,
     email: req.body.email,

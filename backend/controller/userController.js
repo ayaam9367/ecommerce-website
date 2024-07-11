@@ -224,11 +224,13 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(`User not found`, 404));
   }
 
-  const newUserData = {
-    name: req.body.name,
-    email: req.body.email,
-    role: req.body.role,
-  };
+  let newUserData = {};
+
+  if(req.body.role){
+     newUserData = {
+      role: req.body.role,
+    };
+  }
 
   user = await User.findByIdAndUpdate(req.params.id, newUserData, {
     new: true,
@@ -237,10 +239,10 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "user updated successfully",
+    message: "user role updated successfully",
     user,
   });
-});
+});  
 
 //delete user -- ADMIN
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
@@ -275,5 +277,5 @@ const createPasswordPipeline = (id) => [
  * Future Work
  *
  * Level : Urgent
- * Descriiption : make a private function to check whether the user witht the given id exists (DRY)
+ * Descriiption : make a private function to check whether the user with the given id exists (DRY)
  */

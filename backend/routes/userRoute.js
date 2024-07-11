@@ -28,7 +28,7 @@ router.route("/admin/user/:id").get( isAuthenticatedUser, authorizeRoles("admin"
 router.route("/me").get(isAuthenticatedUser, getUserDetails);
 router.route("/password/update").put(isAuthenticatedUser, updatePassword);
 router.route("/me/update").put(isAuthenticatedUser, updateProfile);
-router.route("/updateUserRole/:id").put(updateUserRole);
-router.route("/deleteUser/:id").delete(deleteUser);
+router.route("/admin/user/:id").put(isAuthenticatedUser, authorizeRoles("admin"), updateUserRole);
+router.route("/admin/user/:id").delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser);
 
 module.exports = router;

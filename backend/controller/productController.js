@@ -15,7 +15,7 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
 
 //Get all products
 exports.getAllProducts = catchAsyncErrors(async (req, res) => {
-  const resultPerPage = 5;
+  const resultPerPage = 10;
   const productCount = await Product.countDocuments();
   const apiFeature = new ApiFeatures(Product.find(), req.query)
     .search()
@@ -80,6 +80,64 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     succces: true,
     messgae: "Product deleted successfully",
   });
+});
+
+//Create new review or update the review
+/**
+ * find the product using productId
+ * check if it already reviewd by the particular user
+ * if it is not, then create a new review by pushing a destructured review in the the reeviews array
+ * if it is, update the rating and comment only. 
+ * update the avg ratings of the product and increase the numOfReviws count
+*/
+
+exports.createProductReview = catchAsyncErrors(async(req, res, next) => {
+  const {rating, comment, productId} = req.body;
+
+  const review = {
+    user : req.user._id,
+    name : req.user.name,
+    rating : Number(rating),
+    comment,
+  };
+
+  const product = await Product.findById(productId);
+  if(!product){
+    return next(new ErrorHandler("product not found", 404));
+  };
+
+  const isReviewed = product.reviews.find(rev => rev.user.toString() === req.user._id.toString());
+
+  if(isReviewed){
+    product.reviews.forEach((rev) => {
+      if(rev.user.toString()===req.user._id.toString()){
+        rev.rating = rating,
+        rev.comment = comment
+      }
+    });
+
+  } else {
+    product.reviews.push(review);
+    product.numOfReviews = product.reviews.length;
+  }
+
+  //updating the ratings of the product by calculating the avg
+  let sum = 0;
+  product.reviews.forEach((rev) => {
+    sum += rating;
+  });
+
+  const avg = sum / product.reviews.length;
+
+  product.ratings = avg;
+  await product.save({validateBeforeSave:false});
+
+  res.status(200).json({
+    success : true,
+    message : "product reviewd successfully",
+    product
+  });
+
 });
 
 

@@ -62,8 +62,15 @@ exports.myOrders = catchAsyncErrors(async(req, res, next) => {
 
 //get all orders --  ADMIN
 exports.getAllOrders = catchAsyncErrors(async(req, res, next) => {
+    const orders = await Order.find();
+    const orderCount = await Order.countDocuments();
+    res.status(200).json({
+        success : true,
+        message : "all orders found",
+        orders,
+        orderCount
+    });
+});
 
-})
 
-
-// getAllOrders, updateOrder, deleteOrder
+//  updateOrder, deleteOrder

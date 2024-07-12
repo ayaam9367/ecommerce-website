@@ -31,3 +31,39 @@ exports.newOrder = catchAsyncErrors(async(req, res, next) => {
         order
     });
 });
+
+
+//get single order details 
+exports.getSingleOrder = catchAsyncErrors(async(req, res, next) => {
+    const order = await Order.findById(req.params.id);
+    if(!order){
+        return next(new ErrorHandler("Order not found", 404));
+    };
+
+    res.status(200).json({
+        success : true,
+        message : "order details found",
+        order,
+    });
+});
+
+//get all orders of logged in user
+exports.myOrders = catchAsyncErrors(async(req, res, next) => {
+
+    const orders = await Order.find({user :req.user._id})  
+
+    res.status(200).json({
+        success : true,
+        message : "order details found",
+        orders
+    });
+
+});
+
+//get all orders --  ADMIN
+exports.getAllOrders = catchAsyncErrors(async(req, res, next) => {
+
+})
+
+
+// getAllOrders, updateOrder, deleteOrder

@@ -119,4 +119,4 @@ exports.deleteOrder = catchAsyncErrors(async(req, res, next)=>{
         message : "Order deleted successfully" 
     });
 });
-//  updateOrder, deleteOrder
+

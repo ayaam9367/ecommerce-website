@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
-  shipppingInfo: {
+  shippingInfo: {
     address: {
       type: String,
       required: [true, "Address is required"],
@@ -116,4 +116,8 @@ module.exports = mongoose.model("Order", orderSchema);
 /**
  * read about : https://mongoosejs.com/docs/validation.html should be on your tips this is about the validators made available by mongoose
  * also read : https://mongoosejs.com/docs/guide.html for toJson function so as to improve your database presentation
+ * Future work -
+ * Level : Necessary try out
+ * Description : currently we will be calculating the complete data in the frontend which is not a good practice for several reasons, I want to shift
+ * the whole business logic to backend and carry all of the calculations here for the reason of security, data integrity and scalability ad performance. 
  */

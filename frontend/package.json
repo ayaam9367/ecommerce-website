@@ -17,6 +17,7 @@
     "react-icons": "^4.2.0",
     "react-js-pagination": "^3.0.3",
     "react-material-ui-carousel": "^3.4.2",
+    "react-rating-stars-component": "^2.2.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
@@ -49,5 +50,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "@types/webfontloader": "^1.6.38"
   }
 }

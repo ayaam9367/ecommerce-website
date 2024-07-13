@@ -6,6 +6,7 @@ import MetaData from "../layout/MetaData.js";
 import { getProduct } from "../../actions/productAction.js";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "../layout/Loader/Loader.js";
+import { useAlert } from "react-alert";
 
 const product = {
   name: "Blue Tshirt",
@@ -15,18 +16,22 @@ const product = {
 };
 
 const Home = () => {
+  const alert = useAlert();
   const dispatch = useDispatch();
   const { loading, error, products, productsCount } = useSelector(
     (state) => state.products
   );
 
   useEffect(() => {
+    if (error) {
+      return alert.error(error);
+    }
     dispatch(getProduct());
-  }, [dispatch]);
+  }, [dispatch, error]);
   return (
     <Fragment>
       {loading ? (
-        < Loader/>
+        <Loader />
       ) : (
         <Fragment>
           <MetaData title="ECOMMERCE" />

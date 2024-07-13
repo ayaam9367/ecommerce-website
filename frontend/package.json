@@ -52,11 +52,10 @@
     ]
   },
   "devDependencies": {
+    "@types/react-alert": "^7.0.6",
     "@types/react-helmet": "^6.1.11",
     "@types/react-router-dom": "^5.3.3",
     "@types/webfontloader": "^1.6.38"
   },
-
-  "proxy" : "http://192.168.29.154:4000"
-} 
- 
+  "proxy": "http://192.168.29.154:4000"
+}

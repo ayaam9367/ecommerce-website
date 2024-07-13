@@ -5,6 +5,7 @@ import Product from "./Product.js";
 import MetaData from "../layout/MetaData.js";
 import { getProduct } from "../../actions/productAction.js";
 import { useSelector, useDispatch } from "react-redux";
+import Loader from "../layout/Loader/Loader.js";
 
 const product = {
   name: "Blue Tshirt",
@@ -25,7 +26,7 @@ const Home = () => {
   return (
     <Fragment>
       {loading ? (
-        "loading"
+        < Loader/>
       ) : (
         <Fragment>
           <MetaData title="ECOMMERCE" />
